@@ -60,8 +60,6 @@ export class HubConnection {
     url += (url.indexOf("?") < 0 ? "?" : "&") + ("id=" + this.negotiateResponse.connectionId);
     url = url.replace(/^http/, "ws");
     this.url = url;
-    console.log(url);
-    return false;
     if (this.connection != null && this.openStatus) {
       return;
     }

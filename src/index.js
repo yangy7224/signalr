@@ -1,13 +1,10 @@
 /**
  * Created by yiyang1990 on 2019/2/25.
  */
-import InterfaceConfig from '~/bower_components/config/dist/index.js'  //小程序这里要自己改
+let isMiniProgram = !Boolean(window);
 
-const { HubConnectionBuilder, HttpTransportType, LogLevel } = require('@aspnet/signalr');
-const { HubConnection } = require('./miniProgramSignalr.js');
-
-const ua = window.navigator.userAgent.toLowerCase();
-let isMiniProgram = !Boolean(ua.indexOf('micromessenger') == -1);
+const InterfaceConfig = require(isMiniProgram? '../../../bower_components/config/dist/index.js' : '~/bower_components/config/dist/index.js').default;
+const Hub = require(isMiniProgram ? './miniProgramSignalr.js' : '@aspnet/signalr');
 
 const CommandType = {
     SendMsgName: 'sendMessage',
@@ -17,9 +14,8 @@ const CommandType = {
 
 class SignalR {
     constructor(params){
-        this.connection = {};
+        this.hubConnection = {};
         this.options = params;
-        this.response = {};
         this.init();
         this.start();
         this.register();
@@ -27,12 +23,12 @@ class SignalR {
     //初始化消息中心
     init(){
         if(isMiniProgram){
-            this.connection = new HubConnection();
+            this.hubConnection = new Hub.HubConnection();
         }else{
-            this.connection = new HubConnectionBuilder().withUrl(`${InterfaceConfig.getCurrentConfigUrl()}/chat?token=${this.options.token}`,{
+            this.hubConnection = new Hub.HubConnectionBuilder().withUrl(`${InterfaceConfig.getCurrentConfigUrl()}/chat?token=${this.options.token}`,{
                 skipNegotiation: true,
-                transport: HttpTransportType.WebSockets
-            }).configureLogging(LogLevel.Information).build();
+                transport: Hub.HttpTransportType.WebSockets
+            }).configureLogging(Hub.LogLevel.Information).build();
         }
 
     }
@@ -40,25 +36,25 @@ class SignalR {
     //启动消息中心
     start(){
         if(isMiniProgram){
-            this.connection.start(`${InterfaceConfig.getCurrentConfigUrl()}/chat`, {token: this.options.token}).catch(err => console.error(err.toString()));
+            this.hubConnection.start(`${InterfaceConfig.getCurrentConfigUrl()}/chat`, {token: this.options.token});
         }else {
-            this.connection.start().catch(err => console.error(err.toString()));
+            this.hubConnection.start().catch(err => console.error(err.toString()));
         }
     }
 
     //注册一些基本事件
     register(){
-        this.connection.on(CommandType.SendMsgName, () => {});
-        this.connection.on(CommandType.ReceiveMsgName, (res) => {this.onReceive(res)});
-        this.connection.on(CommandType.ErrorMsgName, (res) => {this.onError(res)});
+        this.hubConnection.on(CommandType.SendMsgName, () => {});
+        this.hubConnection.on(CommandType.ReceiveMsgName, (res) => {this.onReceive(res)});
+        this.hubConnection.on(CommandType.ErrorMsgName, (res) => {this.onError(res)});
     }
 
     //发送消息
     sendMessage(relationType, relationId, toUserId, msg){
         if(isMiniProgram){
-            this.connection.send(CommandType.SendMsgName, ...Array.prototype.slice.call(arguments));
+            this.hubConnection.send(CommandType.SendMsgName, ...Array.prototype.slice.call(arguments));
         }else {
-            this.connection.invoke(CommandType.SendMsgName, ...Array.prototype.slice.call(arguments));
+            this.hubConnection.invoke(CommandType.SendMsgName, ...Array.prototype.slice.call(arguments));
         }
     }
 
