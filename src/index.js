@@ -42,6 +42,11 @@ class SignalR {
         }
     }
 
+    // 停止消息中心
+    stop(){
+        this.hubConnection.stop();
+    }
+
     //注册一些基本事件
     register(){
         this.hubConnection.on(CommandType.SendMsgName, () => {});
@@ -50,7 +55,7 @@ class SignalR {
     }
 
     //发送消息
-    sendMessage(relationType, relationId, toUserId, msg){
+    sendMessage(relationType, relationId, toUserId, dialogueId, msg){
         if(isMiniProgram){
             this.hubConnection.send(CommandType.SendMsgName, ...Array.prototype.slice.call(arguments));
         }else {
