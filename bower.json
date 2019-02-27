@@ -1,0 +1,21 @@
+{
+  "name": "signalr",
+  "description": "signalr",
+  "main": "dist/index.js",
+  "authors": [
+    "yangy@7224.com"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/yangy7224/signalr",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "config": "https://github.com/yangy7224/config.git#^0.0.1"
+  }
+}

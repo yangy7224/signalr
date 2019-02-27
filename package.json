@@ -1,0 +1,22 @@
+{
+  "name": "signalr",
+  "version": "0.0.1",
+  "description": "signalr",
+  "main": "src/index.js",
+  "repository": "https://github.com/yangy7224/signalr.git",
+  "author": "yangy@7224.com",
+  "license": "MIT",
+  "dependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "7.1.5",
+    "babel-preset-es2015": "^6.24.1",
+    "gulp": "^4.0.0",
+    "gulp-babel": "7.0.1",
+    "gulp-minify": "^3.1.0"
+  },
+  "devDependencies": {
+    "@aspnet/signalr": "^1.1.2",
+    "babel-plugin-transform-es2015-modules-umd": "^6.24.1",
+    "webpack-stream": "^5.2.1"
+  }
+}
