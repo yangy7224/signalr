@@ -47,11 +47,11 @@ class SignalR {
             promise = this.hubConnection.start();
         }
         promise && promise.then(function () {
-            console.log('连接成功');
+            console.log('connection successfully');
             clearInterval(that.reBuildInstance);
             that.register();
         }).catch(err => {
-            console.log('连接失败');
+            console.log('connection failed');
             that.rebuildConnetion(err);
         });
 
@@ -65,9 +65,14 @@ class SignalR {
 
     //注册一些基本事件
     register(){
-        this.hubConnection.on(CommandType.SendMsgName, () => {});
-        this.hubConnection.on(CommandType.ReceiveMsgName, (res) => {this.onReceive(res)});
-        this.hubConnection.on(CommandType.ErrorMsgName, (res) => {this.onError(res)});
+        if(isMiniProgram){
+            this.hubConnection.onreceive((res) => { this.onReceive(res.length > 0 && res[0]) });
+        }else{
+            this.hubConnection.on(CommandType.SendMsgName, () => {});
+            this.hubConnection.on(CommandType.ReceiveMsgName, (res) => {this.onReceive(res)});
+            this.hubConnection.on(CommandType.ErrorMsgName, (res) => {this.onError(res)});
+        }
+
     }
 
     //发送消息
@@ -111,7 +116,7 @@ class SignalR {
 
         that.reBuildInstance = setInterval(function () {
             that.buildConnection();
-            console.log('正在尝试重连-----');
+            console.log('trying to Reconnect-----');
         },that.reConnectionTime);
     }
 }

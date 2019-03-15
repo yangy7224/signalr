@@ -31,6 +31,7 @@ export class HubConnection {
     this.url = "";
     this.invocationId = 0;
     this.callbacks = {};
+    this.msgObj = [];
   }
 
   start(url, queryString) {
@@ -87,7 +88,7 @@ export class HubConnection {
       console.log(`websocket disconnection`);
       this.connection = null;
       this.openStatus = false;
-      this.onclose(res);
+      this.onclose();
     });
 
     this.connection.onError(res => {
@@ -111,7 +112,15 @@ export class HubConnection {
 
   onOpen(data) {}
 
-  onclose(msg) {
+  onclose(callback) {
+    callback && callback();
+  }
+
+  onreceive(callback){
+    if(callback){
+      this.callbacks['receive'] = callback;
+      this.callbacks['receive'](this.msgObj);
+    }
 
   }
 
@@ -140,9 +149,9 @@ export class HubConnection {
   }
 
   receive(data) {
-    console.log(data);
+    const that = this;
+
     if (data.data.indexOf("{\"type\":1,") < 0) return;
-    
 
     // todo 原消息结构需要调整，旧的{ msg, nickName = fromClient.NickName, avatar = fromClient.Avatar } 新的 {List<xxx>}
     // todo 接收到信息列表后的处理逻辑，追加到本地消息列表；再根据前端所在的页面：首页-红点，列表页-红点+显示最新1条+重新排序，聊天页-显示最新+设置只读（必须是匹配的relationType和relationId的）
@@ -174,8 +183,12 @@ export class HubConnection {
         });
         break;
       default:
-        console.warn("Invalid message type: " + message.type);
+        console.warn("Invalid message type: " + message.type); break;
     }
+
+      that.msgObj = message.arguments;
+
+      that.onreceive(this.callbacks['receive']);
   }
 
   send(functionName) {
