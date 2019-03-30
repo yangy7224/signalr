@@ -27,7 +27,7 @@ class SignalR {
         if(isMiniProgram){
             this.hubConnection = new Hub.HubConnection();
         }else{
-            this.hubConnection = new Hub.HubConnectionBuilder().withUrl(`${InterfaceConfig.getCurrentConfigUrl()}/chat?token=${this.options.token}`,{
+            this.hubConnection = new Hub.HubConnectionBuilder().withUrl(`${InterfaceConfig.getCurrentConfigUrl()}/chat?token=${this.options.token}&sessionId=${this.options.sessionId}`,{
                 skipNegotiation: true,
                 transport: Hub.HttpTransportType.WebSockets
             }).configureLogging(Hub.LogLevel.Information).build();
